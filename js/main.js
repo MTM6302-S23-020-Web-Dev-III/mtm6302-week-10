@@ -50,11 +50,11 @@ const cats = [
 ]
 
 const catsRow = document.getElementById("catsRow")
-
-// loop over the array of data
-for (const cat of cats) {
-  console.log(cat.name)
-  const card = `
+if (catsRow) {
+  // loop over the array of data
+  for (const cat of cats) {
+    console.log(cat.name)
+    const card = `
   <div class="col">
     <div class="card">
       <img data-bs-toggle="modal" data-bs-target="#exampleModal" src="${cat.thumb}" data-fullimg="${cat.img}" class="card-img-top" alt="placeholder kitten">
@@ -66,21 +66,21 @@ for (const cat of cats) {
     </div>
   </div><!-- col ends -->`
 
-  // Add the card to the cats row
-  catsRow.insertAdjacentHTML("beforeend", card)
-}
+    // Add the card to the cats row
+    catsRow.insertAdjacentHTML("beforeend", card)
+  }
 
-// adding event listener to the row
-catsRow.addEventListener("click", openModal)
+  // adding event listener to the row
+  catsRow.addEventListener("click", openModal)
 
-function openModal (e) {
-  // delegate the event to the target element if it contains class card-img-top
-  if (e.target.classList.contains("card-img-top")) {
-    const fullSizeImage = e.target.dataset.fullimg
-    document.querySelector(".modal-body").innerHTML = `<img src="${fullSizeImage}" alt="placeholder kitten">`
+  function openModal (e) {
+    // delegate the event to the target element if it contains class card-img-top
+    if (e.target.classList.contains("card-img-top")) {
+      const fullSizeImage = e.target.dataset.fullimg
+      document.querySelector(".modal-body").innerHTML = `<img src="${fullSizeImage}" alt="placeholder kitten">`
+    }
   }
 }
-
 /*----------------------------------
              Week 11
 -----------------------------------*/
@@ -151,4 +151,58 @@ function findCat (catName) {
     }
   }
   return null
+}
+
+// Liked Cats Page
+
+// Display cats from localStorage
+
+const likedCatsRow = document.getElementById("likedCatsRow")
+
+if (likedCatsRow) {
+  showCats()
+  function showCats () {
+    // if savedCats array contains one or more cats then display the cats
+    if (savedCats.length > 0) {
+      const likedCards = []
+      for (const cat of savedCats) {
+        const card = `
+      <div class="col">
+        <div class="card">
+          <img data-bs-toggle="modal" data-bs-target="#exampleModal" src="${cat.thumb}" data-fullimg="${cat.img}" class="card-img-top" alt="placeholder kitten">
+          <div class="card-body">
+            <h5 class="card-title">${cat.name}</h5>
+            <p class="card-text">${cat.bio}</p>
+            <a href="#" class="btn btn-light remove" data-catname="${cat.name}">Remove</a>
+          </div>
+        </div>
+      </div><!-- col ends -->`
+        likedCards.push(card)
+      }
+      likedCatsRow.innerHTML = likedCards.join("")
+    } else {
+      // display message that no cats were found
+      likedCatsRow.innerHTML = "No liked cats to show!"
+    }
+  }
+
+  // add event delegation for remove button
+  // add click event listener to likedCatsRow
+  likedCatsRow.addEventListener("click", removeCat)
+
+  function removeCat (e) {
+    // check if the target is the remove button
+    if (e.target.classList.contains("remove")) {
+      e.preventDefault()
+      // get the index of cat to remove from the savedCats array using findCat method
+      const removeCatIndex = findCat(e.target.dataset.catname)
+      console.log(removeCatIndex)
+      // remove the cat from savedCats array
+      savedCats.splice(removeCatIndex, 1)
+
+      // update the local storage with new array
+      localStorage.setItem("mycats", JSON.stringify(savedCats))
+      showCats()
+    }
+  }
 }
